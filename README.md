@@ -1,11 +1,12 @@
 
 # Syntax and Features
+NB: Some definitions have been quoted directly or paraphrased from the [official Kotlin docs](https://kotlinlang.org/docs/home.html).
 
 ## Filtering with predicates vs LINQ
 
 A **predicate** is a lambda function that takes a collection element and returns a boolean value. If a value of `true` is returned, it means the collection element and predicate were matched.
 
-The `::` syntax lets you pass a function without invoking it.
+In this example, the `::` syntax lets you pass a function without invoking it. The `::` syntax can also be used for concise property referencing and constructor referencing.
 
 ### Kotlin
 ```kotlin
@@ -35,13 +36,17 @@ Console.WriteLine(string.Join(", ", evens));  // output: 2, 4
 bool IsEven(int n) => n % 2 == 0;
 var evens = numbers.Where(IsEven).ToList(); // pass function reference instead of calling it
 ```
-## Coroutines vs Async/Await
+## Coroutines vs Async/Await  
+
+A coroutine is defined as "an instance of a suspendable computation" and can be thought of as "lightweight threads".  
+Whilst similar to threads with regards to concurrency, coroutines are not bound to any particular thread and can **suspend** their execution in one thread and resume in another one.
+
 ### Kotlin
 ```kotlin
 import kotlinx.coroutines.*
 
 suspend fun fetchData(): String {
-    delay(1000)  // suspend without blocking thread
+    delay(1000)  // suspend without blocking a thread
     return "Data"
 }
 
