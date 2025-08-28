@@ -1,6 +1,6 @@
 
 # Syntax and Features
-NB: Some definitions have been quoted directly or paraphrased from the [official Kotlin docs](https://kotlinlang.org/docs/home.html).
+NB: Some definitions and examples have been quoted directly or paraphrased from the [official Kotlin docs](https://kotlinlang.org/docs/home.html).
 
 ## Filtering with predicates vs LINQ
 
@@ -38,49 +38,94 @@ var evens = numbers.Where(IsEven).ToList(); // pass function reference instead o
 ```
 ## Coroutines vs Async/Await  
 
-A coroutine is defined as "an instance of a suspendable computation" and can be thought of as "lightweight threads".  
+A coroutine is defined as *an instance of a suspendable computation* and can be thought of as a *lightweight thread*.  
 Whilst similar to threads with regards to concurrency, coroutines are not bound to any particular thread and can **suspend** their execution in one thread and resume in another one.
 
 ### Kotlin
 ```kotlin
 import kotlinx.coroutines.*
 
-suspend fun fetchData(): String {
-    delay(1000)  // suspend without blocking a thread
-    return "Data"
+fun main() = runBlocking {
+    doWorld()
+    println("Done") // runs once coroutines finish
 }
 
-fun main() = runBlocking {
-    val result = fetchData()
-    println(result)
+// launch two coroutines, suspend until both have finished
+suspend fun doWorld() = coroutineScope {
+    launch {
+        delay(2000L)
+        println("World 2")
+    }
+    launch {
+        delay(1000L)
+        println("World 1")
+    }
+    println("Hello") // runs immediately
 }
+
+/*
+output:
+Hello
+World 1
+World 2
+Done
+*/
 ```
 ### C#
 ```csharp
+using System;
 using System.Threading.Tasks;
 
-async Task<string> FetchDataAsync() 
+static async Task Main()
 {
-    await Task.Delay(1000);  // non-blocking wait
-    return "Data";
+    await DoWorld();
+    Console.WriteLine("Done"); // runs once tasks finish
 }
 
-static async Task Main() 
+static async Task DoWorld()
 {
-    var result = await FetchDataAsync();
-    Console.WriteLine(result);
+    // fire off two tasks
+    var task1 = Task.Run(async () =>
+    {
+        await Task.Delay(2000);
+        Console.WriteLine("World 2");
+    });
+
+    var task2 = Task.Run(async () =>
+    {
+        await Task.Delay(1000);
+        Console.WriteLine("World 1");
+    });
+
+    Console.WriteLine("Hello"); // runs immediately
+
+    // concurrency equivalent, wait for both tasks to finish
+    await Task.WhenAll(task1, task2);
 }
+/*
+output:
+Hello
+World 1
+World 2
+Done
+*/
 ```
 
 ## Lambda functions
 ### Kotlin example
 ```kotlin
-fun isEven(n: Int) = n % 2 == 0
+{ n: Int -> n % 2 == 0 }   // explicit type + parameter
+{ n -> n * 2 }             // inferred type
+{ it * 2 }                 // single-parameter shorthand
+{ a, b -> a + b }          // multiple parameters
 ```
 
 ### C# example
 ```csharp
-bool IsEven(int n) => n % 2 == 0;
+n => n % 2 == 0        // single parameter
+n => n * 2             // inferred type
+(x, y) => x + y        // multiple parameters
+() => 42               // no parameters
 ```
 ## Null safety
 
